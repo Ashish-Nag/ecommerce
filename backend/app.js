@@ -4,6 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+const cors = require('cors')
 
 // route dependencies
 const prodRoute = require('./routes/products');
@@ -19,6 +20,8 @@ const port = process.env.PORT || 300;
 const apiUrl = process.env.API_URL;
 
 // middlewares
+app.use(cors());
+app.options('*', cors())
 app.use(express.json());
 app.use(morgan('tiny'));
 
