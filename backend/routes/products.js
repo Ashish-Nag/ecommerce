@@ -87,13 +87,26 @@ router.put('/:id', async (req, res) => {
     const category = await Category.findById(req.body.category);
     if (!category) return res.status(400).json({ success: false, msg: "Category invalid" });
 
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(400).json({ success: false, msg: "could not find the product" });
+
+    const file = req.file;
+    let imagePath;
+
+    if (file) {
+        const fileName = file.filename;
+        const basePath = `${req.protocol}://${req.get('host')}/public/uploads/`;
+        imagePath = `${basePath}${fileName}`;
+    } else {
+        imagePath = product.image;
+    }
     const prod = await Product.findByIdAndUpdate(
         req.params.id,
         {
             name: req.body.name,
             description: req.body.description,
             richDescription: req.body.richDescription,
-            image: req.body.image,
+            image: imagePath,
             price: req.body.price,
             category: req.body.category,
             rating: req.body.rating,
@@ -160,6 +173,10 @@ router.put('/galleryimages/:id', uploadOptions.array('images', 5), async (req, r
         },
         { new: true }
     );
+
+    if (!product) return res.status(400).json({ success: false, msg: "The product cannot be updated" });
+
+    return res.status(200).json(product);
 });
 
 module.exports = router;
